@@ -44,7 +44,7 @@
      % The title of the paper. Use \shorttitle to indicate an abbreviated title
      % for use in running heads (you will need to uncomment it).
 
-\title{Wofry for Optics}
+\title{WOFRY: a package for partially coherent beamline simulations in fourth-generation storage rings}
 %\shorttitle{Short Title}
 
      % Authors' names and addresses. Use \cauthor for the main (contact) author.
@@ -53,10 +53,13 @@
      % affiliations; if there is only one affiliation address, remove the [a].
 
 \cauthor[a]{Manuel}{Sanchez del Rio}{srio@esrf.eu}{address if different from \aff}
-\author[b]{Luca}{Rebuffi}
-
+\author[a]{Juan}{Reyes-Herrera}
+\author[b]{Rafael}{Celestre}
+\author[c]{Luca}{Rebuffi}
 
 \aff[a]{European Synchrotron Radiation Facility, 71 Avenue des Martyrs, 38000 Grenoble \country{France}}
+\aff[b]{Synchrotron SOLEIL, L'Orme des Merisiers Départementale 128, 91190 Saint-Aubin \country{France}}
+\aff[c]{Argonne National Laboratory, 9700 South Cass Avenue, Lemont, Illinois 60439, \country{USA}}
 % \aff[b]{Second affiliation address}
 
      % Use \shortauthor to indicate an abbreviated author list for use in
@@ -105,14 +108,66 @@ We used a new software tool to perform coherent mode decomposition of the undula
 
 xxx
 
-The paper is organized as follows. Section 2 summarizes the methodology used for 1D coherent mode decomposition of undulator beams. Section 3 analyzes the focusing of partially coherent beams with a single refractive system (lens). Section 4 discusses the pairing of two refractive systems. Section 5 shows simulations for the full beamline and compares different methodologies for a selected case. A general discussion is in section 6 and concluding remarks in section 7. 
 
-\section{One dimensional coherent mode decomposition of an undulator source and propagation along a beamline with lenses}
+
+
+
+\section{Modelling Sources}
+
+A wavefront simulation consists of the creation of a wavefront with some characteristics (geometry, wavelength), its propagation in free space and its modification by the optical elements (slits, mirrors, etc). We restrict the description here to a 1D model in the ($x,y$) plane, with $y$ as the propagation direction (optical axis) and $x$ as the direction transverse to the beam propagation to analyze (usually the of horizontal or vertical plane). The wavefront is represented by the electric field of a monochromatic component (angular frequency $\omega$, wavelength $\lambda$, wavenumber $k = 2 \pi / \lambda$ or photon energy $W$) at a position $y=0$ along the propagation direction. This electric field or electric disturbance is a complex scalar $E(x;y=0,\omega)$ or, in case of polarized beams, two complex scalars, one for $\sigma$ and the other for $\pi$ polarization. The wavefront intensity is the square of the modulus of the amplitude: $I=|A \exp{(i\phi)}|^2=A^2$. 
+
+
+\subsection{Simple waves: plane, spherical and Gaussian}
+
+The simplest wavefront is a plane wave, with constant complex amplitude for any $x$ coordinate: 
+\begin{equation}
+   E(x;y=0,\omega)=E_0=A_0 e^{i \phi_0},
+\end{equation}
+where $E_0$ is a complex value that can be expressed in its constant real amplitude $A_0$ and a constant phase $\phi_0$. A plane wave is infinite along the $x$ direction. However, when representing a wavefront spatially, in simulation, the electric field has to be sampled over an array of discrete values of complex amplitude, and they are necessarily defined over a finite $x$ interval. 
+
+A spherical wave (strictly speaking a circular wave in 1D, but we keep the terminology used in 2D) emanates from a fixed point and has a constant complex amplitude over a sphere of a given radius $R$. Obviously it cannot be represented at the source point ($y=0$, center of the sphere) and our wavefront must be sampled at a given distance $y=R$ and over a line perpendicular to the radius and tangent to the sphere. At $x=0$ (a point in the sphere) the field has a constant value equal to the value at the surface. But at a $x{\ne}0$, over a range of $x$-values $x{\ll}R$ (i.e. for small numerical apertures, NA) the distance from $x$ to the sphere parallel to the $y$ direction gives an optical path that modifies the phase by $k ~\Delta x$. It is easy to deduce that the wavefront in the line tangent to the sphere has the expression
+\begin{equation}
+\label{eq:sphericalWave}
+    E(x;y=R,\omega)  = E_0 e^{i k x^2 / (2 R)}.
+\end{equation}
+
+% possible figure: 
+% https://slideplayer.com/slide/730247/2/images/10/Spherical+wave+propagation.jpg
+
+A Gaussian beam at the source position $y$=0 has constant phase and intensity following a Gaussian distribution with standard deviation $\sigma_I$, thus the electric disturbance is: 
+\begin{equation}
+\label{eq:gaussianSource}
+    E(x;y=0,\omega) = E_0 e^{-x^2 / (4 \sigma_I^2)}
+\end{equation}
+
+
+\subsection{A simplified model for the undulator source}
+\label{sec:undulator}
+
+A single electron (or filament beam) traveling in an undulator with pure sinusoidal magnetic field in one direction will produce a complicated wavefront with geometry that varies as a function of the photon frequency (see, e.g., Ref.~\cite{elleaume}). At the resonance energy the angular emission in the far field can be approximated by a Gaussian function of width \cite{elleaume}
+\begin{equation}
+\label{eq:undulatorDivergence}
+    \sigma'_u \approx\sqrt{\frac{\lambda}{2 L}},
+\end{equation}
+with wavelength of the photons at the undulator resonance, $\lambda$, and undulator length, $L$. At the source point, the size of the source can also be approximated by a Gaussian of width
+\begin{equation}
+\label{eq:undulatorSize}
+    \sigma_u \approx\sqrt{\frac{\lambda L}{2 \pi^2}} = \frac{\lambda}{2 \pi} \frac{1}{\sigma'}.
+\end{equation}
+
+A  simplification of the undulator radiation in the far field consists in a spherical wave (Eq.\ref{eq:sphericalWave}) with origin in the undulator center modulated with an amplitude that follows the Gaussian in Eq.~\ref{eq:undulatorDivergence}, therefore
+\begin{equation}
+    \label{eq:undulatorBySphericalWave}
+    E(x;y=y_0,\lambda) = E_0 e^{i k x^2 / (2 y_0)} e^{-x^2/(4 \sigma'_u{}^2 y_0^2)}.
+\end{equation}
+
+A second way to simulate the undulator is considering a Gaussian source as defined in Eq.~\ref{eq:gaussianSource} with $\sigma_I=\sigma_u$. Note that propagating this approximation of the undulator as a Gaussian source to a screen at $y=y_0$ does not reproduce the result in Eq.~\ref{eq:undulatorBySphericalWave} because Gaussian propagation implies a product of sigmas (emittance) of $\lambda / (4 \pi)$ whereas for undulator radiation the emittance is approximately $\lambda / (2 \pi)$ (Eq.~\ref{eq:undulatorSize}). For practical purposes, the Gaussian source approximation can be used for optical systems accepting a high NA, whereas for systems of small NA, as used in this paper, the spherical wave approximations may be preferred.
+
+\subsection{Partial coherence modeling the undulator beam using coherent mode decomposition}
 
 For the calculations presented in this paper we have developed a new tool for dealing with partially coherence beams produced by undulators in low-emittance storage rings. For that, we developed a 1D model of the coherent mode decomposition previously developed in 2D \cite{glass2017}. The motivation for developing these new tools is to perform quick calculations (e.g., being able to perform parametric calculations in a laptop) with high accuracy in the simulation of the source and beam propagation. We believe that the separation of the real 2D wavefront in two separated 1D wavefronts is well justified for most synchrotron beamlines, where the cross-talk between these two directions is small. 
 The tools developed here are included in the OASYS toolbox \cite{codeOASYS}, available in the WOFRY add-on \cite{XX}. These tools are completely scriptable so they can be used from the OASYS interface, which also creates scripts that can be a posteriori modified for batch runs. 
 
-\subsection{Partial coherence modeling the undulator beam using coherent mode decomposition}
 
 The electrons in an storage ring are statistically distributed, following (in good approximation) a Gaussian distribution in a 6-dimensional space (three spatial coordinates, two angles to define direction, and the electron energy). Many electrons therefore contribute to photon beam radiation, each one creating a wavefront. The consequence is that the overall radiation cannot be described deterministically which implies that statistical methods are needed, like for describing the electron beam. This is the origin of partial coherence of the synchrotron emission. As stated before, in an ideal storage ring of zero emittance, the electrons follow a filament beam so the emission is fully coherent. As soon as  electron emittance increases, the electrons contributing to the radiation start to have different initial conditions (in the 6-dimensional space) and the overall emission cannot be describe by a single wavefront, but by statistically distributed wavefronts, described by partial coherent optics.
 
@@ -164,14 +219,75 @@ It is important to calculate the real emission of the undulator which is very di
 
 The interest of the coherent mode decomposition method is twofold: the possibility to propagate a partial coherent beam along the beamline by just propagating a few modes (less modes for a more coherent beam) which behave like coherent wavefronts, and the use of the coherent fraction (a scalar parameter) as a accurate well-defined measure of how coherent is the beam at any position of the beamline.
 
-\subsection{Wavefront propagation}
-
-% In the limiting case of zero emittance (i.e., ``single-electron" or filament beam), the undulator emission is fully coherent and the wavefront can be calculated using the classical electrodynamics \cite{XX}. These equations are implemented in the pySRU python library \cite{XX} that is used to calculate the undulator emission at a given distance from the source. 
-
-The wavefront evolves when transported in free space from two different positions along the optical axis. We used integral propagators to calculate the wavefront in a given point using the wavefront in another position. In wofry we implemented two propagators, one based on the direct implementation of the  Rayleigh-Sommerfeld integral, and a second one, the zoom propagator, is a Fresnel propagator using FFT. Both propagators are described in \cite{srioLBL}. The effect of the different elements needed for the simulations in this work are presented in the following sections. 
 
 
-\subsection{Wavefront modification by apertures}
+\section{Free space propagators}
+\label{sec:propagators}
+
+
+For simulating the beamline, the wavefront at the source has to be created using the methods in section  \ref{sec:sources}, and then the optical elements modify sequentially the wavefront using the algorithms described in section \ref{sec:elements}.  But the wavefront evolves when transported in free space from element to element. We use here two propagators. 
+
+\subsection{Direct implementation of integral Rayleigh-Sommerfeld propagator}
+\label{sec:integralPropagator}
+
+The Rayleigh-Sommerfeld propagator for small-angle approximation expresses the electric field at a spatial point $\vec{r}'$ as an integral of the electric field at a spatial point $\vec{r}$ \cite{goodmanfourier}
+\begin{equation}\label{eq:RSpropagator}
+E(\vec{r}') =  \frac{k}{2 \pi i} \int \frac{E(\vec{r})}{|\vec{r}'-\vec{r}|} e^{ i k |\vec{r}' - \vec{r}|  }  d\Sigma,
+\end{equation}
+where the integral is made over the domain of the source (the surface $\Sigma$). 
+This propagator can be applied to numerical discrete 1D wavefronts, and the integral reduces to a sum
+\begin{equation}\label{eq:discreteRSpropagator}
+E(x_1,y_1) \approx \frac{k}{2 \pi i \Delta y}  \sum_{i=0}^{N-1}  E(x_{0,i},y_{0,i}) e^{i k \sqrt{(x_1 - x_{0,i})^2 + (y_1 - y_{0,i})^2} }  \Delta x_0,
+\end{equation}
+where $\Delta y$ is the mean value of the denominator in the integral in Eq.~\ref{eq:RSpropagator}.
+Note that one sum over the $N$ points of the sampled incident wavefront has to be done for each coordinate at the transported wavefront, thus the number of operations is of the order $N^2$. This simple propagator gives flexibility to define different gridding and limits permitting the adjustment of the spatial domain or window and spatial resolution when working with converging or divergent wavefronts. Moreover, the propagated wavefront can be computed in a plane (or line) non parallel to the incident one, a feature that is exploited in sections~\ref{sec:grazingReflector} and \ref{sec:grating}. 
+
+
+\subsection{Fresnel propagator using FFT: The zoom propagator}
+\label{sec:zoomPropagator}
+
+
+The Fresnel propagator is obtained by making a Taylor expansion of the quadratic phase in Eq.~\ref{eq:RSpropagator}: 
+\begin{equation}\label{eq:fresnelPropagator}
+E(x;y_1) =  \frac{e^{i k (y_1-y_0)}}{\sqrt{i \lambda (y_1-y_0)}} \int E(x';y_0) e^{ \frac{i k}{2 (y_1-y_0)}  (x-x')^2  }  dx'.
+\end{equation}
+
+The Fresnel integral propagator can be seen as convolution of the wavefield with a Gaussian kernel. One can write Eq. \ref{eq:fresnelPropagator} in convolution form, involving \inblue{a Fourier transform $\mathcal{F}$ and an inverse Fourier transform $\mathcal{F}^{-1}$}\cite{goodmanfourier}:
+\begin{equation}\label{eq:fft}
+E(x; y_1) = \inblue{P^G} \mathcal{F}^{-1}\Big\{ \mathcal{F}\{E\} K \Big\},
+\end{equation} 
+where \inblue{$E$ is the electric perturbance at $y_0$ $E(x;y_0)$, $P^G=e^{i k (y_1-y_0)}$ is a global phase and $K=e^{-i \pi \lambda (y_1-y_0) u^2}$ is the Gaussian Kernel } that comes from the inverse Fourier Transform of the exponential inside the integral in Eq.~\ref{eq:fresnelPropagator}, being $u$, the conjugated variable of $x$.
+The real benefit of using this scheme comes from the use of Fast Fourier Transforms, that reduce the number of operations from $N^2$ to $N \log_2 N$. Its use is essential when doing simulations in 2D, because the direct calculation of the integral lead to $N^4$ operations at the limit of calculation power of usual laptop computers. However, the FFT implementation requires that the gridding and spatial domain of the incident and transported wavefronts must be equal. This is a problem when a wavefront is propagated to a focal point: the gridding of the incident wavefront used at the image provides a poor resolution because most of the intensity is concentrated in a very few pixels. A clever solution to this problem is presented by J.D. Schmidt \cite{schmidt} that makes possible to calculate the propagated field in a ``zoomed'' window, thus permitting optimizing the wavefront sampling in cases for propagating highly convergent or divergent wavefronts. The problem reduces to a convolution problem of the unpropagated field field $E(x;y_0)$ affected by a phase $P$ with a kernel $K$, and the result affected by a global phase $P^G$: 
+\begin{equation}
+E(x; y_1) = P^G \mathcal{F}^{-1} \Big\{ \mathcal{F} \big\{ E~~P \big\} K \Big\},
+\end{equation}
+where
+\begin{equation}
+P^G =  \frac { e^{ik(y_1-y_0) }}{\sqrt{m_x} }e^{i \frac{k}{2 (y_1-y_0)} \frac{m_x - 1}{m_x}x_2^2},
+\end{equation}
+\begin{equation}
+P = e^{i \frac{k}{2(y_1-y_0)} (1-m_x)x_1^2 },
+\end{equation}
+\begin{equation}
+K = e^{-i \pi \lambda (y_1-y_0) \frac{u^2}{m_x} }.
+\end{equation}
+The term $m_x$ is the magnification (zoom) factor. 
+Note that setting unity magnification $m_x=1$, one obtains the standard Fresnel propagator (Eq.~\ref{eq:fft}).
+
+\section{Modeling beamline elements}
+\label{sec:elements}
+
+In cases where the distance between elements is significantly greater than the mirror sizes, the optical elements can be approximated as thin elements (zero thickness along the $y$ axis), and their effect can be encapsulated in a complex transmission amplitude,
+\begin{equation}
+    \label{eq:thinelement}
+    R(x;\omega)=r(x;\omega) e^{i \rho(x,\omega)}.
+\end{equation}
+Therefore, the wavefield after an optical element placed at position $y=y_0$ will be the wavefield at $y_0$, just before the interaction, multiplied by the complex transmission:
+\begin{equation}
+    E'(x;y=y_0,\omega) = E(x;y=y_0,\omega) R(x;\omega)
+\end{equation}
+
+\subsection{Apertures}
 
 A generic aperture is a mask that transmits a part of the wavefront in a range $[x_{min},x_{max}]$ and absorbs the rest. It can be
 \begin{equation}
@@ -188,7 +304,42 @@ When the element is a slit, then $A=1$. If it is a beamstop, then $A=0$. In the 
 
 A sometimes useful case is the ``Gaussian slit" where $A=\exp(-x^2/(2\sigma_a))$. \todo{check is Gaussian applies to amplitude or intensity (in that case is divided by 4 instead 2)} The aperture acts as a Gaussian appodization window. Although artificial, it is interesting to shape the beam with a Gaussian profile, which remains a Gaussian after propagation. Therefore, a Gaussian slit acting on a plane wavefront does not produce diffraction fringes. Several recipes are proposed to relate $\sigma_a$ with the slit aperture $a=x_{max}-x_{min}$. We found convenient to define $\sigma_a=\Delta a/2.355$ (see Appendix \ref{appendix:slit}).
 
-\subsection{Wavefront modification by refractive systems}
+\subsection{Mirrors}
+\subsection{Ideal mirror}
+\label{sec:idealReflector}
+
+Let us consider a perfectly reflecting surface (no absorption) with a profile $h(w)$ with $h$ the elevation (height) and $w$ the linear coordinate in a reference frame attached to the reflector with origin in the reflector's center. A plane reflector has $h(w)=0$ and, for example, a circular mirror of radius $R$ has $h(w)=R-\sqrt{R^2 - w^2}$. The profile $h(w)$ can also match a deformation originated for instance by heat load or a mirror surface error (waviness).
+
+If the reflector is set with an incident angle $\theta$, with the propagation axis $y$, the change of optical path is $\Delta y = 2 h(w) \sin \theta$, $w=x/\sin\theta$, with a consequent phase shift $\Delta \Phi = - k \Delta y $, therefore for the ideal reflector
+\begin{equation}
+\label{eq:idealReflector}
+    R(x;\omega) = e^{-2 i k h(w) \sin \theta}.
+\end{equation} 
+
+This model of ideal reflector as a thin object  can be used for any reflecting shape (circular, ellipse, etc.) but the intrinsic aberrations are not correctly considered.  The main reason is the incidence angle $\theta$ is not constant along the mirror profile thus Eq.~\ref{eq:idealReflector} is not exact. A model for a ``grazing reflector" that solves this problem is presented in the next section \ref{sec:grazingReflector}.
+
+A reflector of a finite size can be decomposed in two elements: the ideal reflector described here, followed (or preceded) by the aperture as described in \ref{sec:aperture}.
+
+\subsubsection{Grazing incidence mirror}
+\label{sec:grazingReflector}
+
+The method used for the {\it ideal reflector} does not account for mirror aberrations and it is not exact when dealing with mirror errors because the optical path is approximated. These effects are more important for elements in grazing incidence, where the {\it thin object} approximation is not valid. A solution for that consists in using the propagator in Sec.~\ref{sec:integralPropagator} to propagate the incident wavefront until the points in the mirror surface $(w,h)$. Let be $p$ the distance from the wavefront $E_0(x,;y=0,\omega)$ to the center of the mirror placed at a grazing incidence $\theta$ with the optical axis. In the mirror reference frame, the wavefront coordinates are $(w_s, h_s) =(-p \cos \theta, p \sin \theta) + (x \sin \theta, x \cos \theta)$. It is straightforward to extend the integral propagator (Eq.~\ref{eq:discreteRSpropagator}) to calculate the propagated field at the surface points $(w,h)$ by summing over all points of the input wavefront. Once the electric perturbation at the mirror surface is known, another propagation is performed using the same principle, to the image plane placed at a distance $q$ from the mirror center.
+
+\subsection{Gratings}
+\label{sec:grating}
+
+A grating produces a diffraction of the incident beam that is dependent on its wavelength. It is expressed by the grating equation:
+\begin{equation}
+    m \lambda g = \sin\alpha + \sin\beta,
+\end{equation}
+with $\alpha$ the incidence angle (measured with respect to the normal), $\beta$ the reflection angle, with opposite sign of $\alpha$ if it lies at the other side of the normal, $m$ the diffraction order (positive for inside reflection, i.e., $\alpha \ge |\beta|$),
+%(note than in SHADOW is the contrary, inside orders are negative)
+$\lambda$ is the photon wavelength, and $g$ is the grating groove density, which is a function of $w$ for VLS gratings: $g = g_0 + g_1 w + g_2 w^2 + ...$ with $g_0 = 1/d_0$ the lines per unit of length at the grating center ($d_0$ the distance between two grating lines).
+
+The simulation of a grating using a thin object model (Eq.~\ref{eq:idealReflector}) is difficult because in addition to the geometric optical path it is necessary to account for the wavelength-dependent component. We use here an approach that is exact, except for accounting for the diffraction efficiency, which consisting of sampling the grating as a numeric mesh and apply the ``grazing reflector." 
+This model also permits to study line spacing errors together with height errors of the substrate. It is important not to undersample the grating (e.g., we must include several points per period) and orientate the incident and image wavefronts with the correct angles $\alpha$ and $\beta$.
+
+\subsection{Refractive systems}
 
 \subsubsection{Ideal lens}
 We can define an ideal lens as a focusing device that converts a plane wave into a spherical wave collapsing to the focus at a distance $f$ from the ideal lens position. Therefore
@@ -220,18 +371,35 @@ The profile of a real lens $z(x)$ can be decomposed in the ideal parabolic profi
 One can imagine a refractive object to focus an arbitrary incoming wavefront to a given point placed at a distance $D$. In other words, this object would transform the incoming wavefront into a spherical (circular in 1D) wavefront collapsing to the focus. The profile of such refractive ``corrector"  can be calculated using the phase difference $\Delta\phi(x)=\phi_S(x)-\phi(x)$ where $\phi_S=k x^2 / (2 D_w)$ is the phase of the circular wave collapsing at $D_w$, $k$ is the wavenumber ($k=2\pi/\lambda$) and $\phi$ is the phase of the incoming wavefront. The corrective profile is $z(x)=-\Delta\phi/(k \delta(\omega))$.
 
 
-% In addition, we also compared the results with a Gaussian Shell-model in 1D, which is the most simplistic approximation among all partial coherent methods used in this work. 
+
 
 
 \section{Simulations of the complete beamline}
 
-In this section...
+\subsection{Example of an ESRF beamline}
+xxx
+
+\subsection{Example of an APS beamline}
+xxx
 
 
-\section{Summary and conclusions}
+
+\section{Discussion}
+
+\subsection{Undulator coherent modes versus Gaussian-hermite modes}
+
+xxx
+
+\subsection{Coherent fraction out of resonance}
+
+xxx
+
+\section{Discuss grazing optics and surface errors}
+
+\subsection{Summary and conclusions}
 \label{sec:summary}
 
-We have studied...
+xxx
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
