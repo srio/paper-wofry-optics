@@ -58,11 +58,9 @@ Wavefront simulations are getting more and more interest in 4th generation synch
 
 Several codes exist in the synchrotron community for physical optics calculations, like SRW\cite{codeSRW}, XRT\cite{XRT}, WISE\cite{wise}, MOI\cite{MOI}, etc. with different implementations, each featuring pros and cons, but none of them satisfy all our requirements. The objectives that drove us to develop WOFRY are i) the need of a fast a quick prototyping of a complete beamline using physical optics, ii) run it in a powerful and simple user interface, iii) light enough to run in a laptop, iv) model accurately the partial coherence (including coherent fraction along the beamline), v) exact simulation the surface errors in mirrors and lenses, and vi) automatic generation of scripts that could be used in cloud computing.    
 
-WOFRY is built upon a framework library \cite{syned} featuring key components such as the "Propagation Manager" and "Propagator" objects, which serve as the interface to wavefront propagation algorithms, providing a high-level representation of the propagation mechanism of wavefronts.
+WOFRY is built upon a framework library \cite{syned} featuring key components such as the ``Propagation Manager" and ``Propagator" objects, which serve as the interface to wavefront propagation algorithms, providing a high-level representation of the propagation mechanism of wavefronts.
 In terms of source simulation, WOFRY goes beyond basic plane, spherical and Gaussian waves. It makes calculation of partial coherence using not only the Gaussian Shell-model but also performs coherent mode decomposition of undulator radiation\cite{SanchezdelRio2022CMD}.
-Several optical elements are implemented, including absorbers (slits and stops), reflectors (mirrors and gratings), and refractors (ideal lenses, real lenses, compound refractive lenses, and thin objects \cite{Celestre2019}).
-The physical models and algorithms implemented in the different components of WOFRY are 
-presented in this paper. 
+Several optical elements are implemented, including absorbers (slits and stops), reflectors (mirrors and gratings), and refractors (ideal lenses, real lenses, compound refractive lenses, and thin objects \cite{Celestre2019}). The physical models and algorithms implemented in the different components of WOFRY are presented in this paper. 
 
 
 
@@ -82,7 +80,7 @@ The wavefront is represented by the electric field $E$ of a monochromatic compon
 This electric field or electric disturbance is a complex scalar $E(x;y=0,\omega)$. It can be also expressed by two real numbers, and amplitude $A$ and a phase $\phi$,  $E= A \exp{(i\phi)}$. In the case of polarized beams, two complex scalars, $E_\sigma$ and $E_\pi$ are used for $\sigma$ and $\pi$ polarization, respectively.
 The wavefront intensity is the square of the modulus of the amplitude: $I=|E|^2=|E_\sigma|^2 + |E_\pi|^2$. In WOFRY, the wavefront is an array of complex numbers over a discretized mesh. 1D wavefronts are $E(x_i;y,\omega)$ and 2D wavefronts are $E(x_i,z_j;y,\omega)$. Every wavefront is defined at a position $y$ and for a photon energy $\omega$. This dependency is not explicit in the following.
 
-The wavefront evolves when transported in free space. A propagator computes a wavefront $E(x;y_2)$ in a point $y_2$ knowing the wavefront in another position $E(x;y_1)$ and the distance $\Delta$ in free space $y_2 = y_1 + \Delta$. WOFRY has implemented two propagators, described here. \todo{CHECK ALL EQUATIONS, IN PARTICULAR THE CONSTANT TERM}
+The wavefront evolves when transported in free space. A propagator computes a wavefront $E(x;y_2)$ in a point $y_2$ knowing the wavefront in another position $E(x;y_1)$ and the distance $\Delta$ in free space $y_2 = y_1 + \Delta$. WOFRY has implemented two propagators, described here. \todo{CHECK THE CONSTANT TERM}
 
 % -----------------------------------------------------------------
 \subsection{Direct implementation of integral Rayleigh-Sommerfeld propagator}
@@ -97,7 +95,7 @@ This propagator can be applied to numerical discrete 1D wavefronts, and the inte
 \begin{equation}\label{eq:discreteRSpropagator}
 E(x_2;y_2) = \frac{e^{i k \Delta}}{\sqrt{2 \pi i \Delta}}  \sum_{i=0}^{N-1}  E(x_{1,i};y_1) e^{i k \sqrt{(x_2 - x_{1,i})^2 + \Delta^2} }.
 \end{equation}
-Note that one sum over the $N$ points of the sampled incident wavefront has to be done for each coordinate at the transported wavefront, thus the number of operations is of the order $N^2$. This simple propagator gives flexibility to define different gridding and limits permitting the adjustment of the spatial domain or window and spatial resolution when working with converging or divergent wavefronts. Moreover, the propagated wavefront can be computed in a plane (or line) non parallel to the incident one, a feature that is exploited in sections~\ref{sec:mirror1D} and \ref{sec:grating}. 
+Note that the sum extends over the $N$ points of the sampled incident wavefront has to be done for each coordinate at the transported wavefront, thus the number of operations is of the order $N^2$. This simple propagator gives flexibility to define different gridding and limits permitting the adjustment of the spatial domain or window and spatial resolution when working with converging or divergent wavefronts. Moreover, the propagated wavefront can be computed in a plane (or line) non parallel to the incident one, a feature that is exploited in section~\ref{sec:mirror1D}.
 
 
 % -----------------------------------------------------------------
@@ -110,7 +108,8 @@ The Fresnel propagator is obtained by making a Taylor expansion of the quadratic
 E(x;y_2) =  \frac{e^{i k \Delta}}{\sqrt{i \lambda \Delta}} \int E(x';y_1) e^{ \frac{i k}{2 \Delta}  (x-x')^2  }  dx'.
 \end{equation}
 The Fresnel integral propagator can be seen as convolution of the wavefield with a Gaussian kernel. One can write Eq. (\ref{eq:fresnelPropagator}) in convolution form \cite{goodmanfourier}, involving a Fourier transform $\mathcal{F}$ and an inverse Fourier transform $\mathcal{F}^{-1}$. The real benefit of using this scheme comes from the use of Fast Fourier Transforms, that reduce the number of operations from $N^2$ to $N \log_2 N$. Its use is essential when doing simulations in 2D, because the direct calculation of the integral lead to $N^4$ operations at the limit of calculation power of usual laptop computers.
-In WOFRY we permit different windows for the incident and transported wavefronts, which is interesting when propagating highly divergent or converging wavefronts. It is possible to calculate the propagated field in a ``zoomed'' window, thus permitting optimizing the wavefront sampling in cases for propagating highly convergent or divergent wavefronts. This is implemented using the method proposed in \cite{schmidt}. The problem reduces to a convolution problem of the unpropagated field field $E(x;y_0)$ affected by a phase $P$ with a kernel $K$, and the result affected by a global phase $P^G$
+% In WOFRY we permit different windows for the incident and transported wavefronts, which is interesting when propagating highly divergent or converging wavefronts.
+It is possible to calculate the propagated field in a ``zoomed'' window, thus permitting optimizing the wavefront sampling in cases for propagating highly convergent or divergent wavefronts. This is implemented using the method proposed in \cite{schmidt}. The problem reduces to a convolution problem of the unpropagated field field $E(x;y_0)$ affected by a phase $P$ with a kernel $K$, and the result affected by a global phase $P^G$
 %
 % \begin{equation}\label{eq:fft}
 % E(x; y_1) = P^G \mathcal{F}^{-1}\Big\{ \mathcal{F}\{E\} K \Big\},
@@ -157,7 +156,7 @@ We describe here the models for the different widgets that are used to create so
 \subsection{``Generic Wavefront" widgets}
 
 In this section, we present the models for the different sources available in the ``Generic Wavefront 1D" and ``Generic Wavefront 2D" widgets. 
-We restrict the formulation here to a 1D model. For the 2D models, the wavefront is created typically by composing the H and V 1D models.  
+We restrict the formulation here to a 1D model. For the 2D models, the wavefront is created typically by composing the horizontal and vertical 1D models.  
 
 % +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 \subsubsection{Plane Wave}\hspace*{\fill} \\
@@ -208,7 +207,7 @@ The occupancy $\eta$ of the i-th mode is defined as the ratio of its intensity t
 \begin{equation}
 \eta_i(\omega) = \frac{\lambda_i(\omega)}{\sum_{n=0}^{\infty} \lambda_n(\omega)}.
 \end{equation}
-It is natural to rigorously define Coherent Fraction ($CF$) as the occupancy of the first coherent mode $CF=\eta_0$.
+The Coherent Fraction ($CF$) is the occupancy of the first coherent mode $CF=\eta_0$.
 
 The CSD of the GSM in Eq.~(\ref{GS_CSD}) can be expanded analytically in coherent modes \cite{Starikov82}. The resulting eigenvalues are
 \begin{align}
@@ -227,7 +226,7 @@ The eigenfunctions are
 \end{equation}
 with $H_n$ are the physicist's Hermite polynomials of order $n$. 
 
-Note that the 0$^\text{th}$ mode is $E_0(x) \propto \exp(-c x^2) = \exp(-\sqrt{(16 \sigma_I^2)^{-1} + (4 \sigma_I^2 \beta^2)^{-1}} x^2)$ which in general differs from the basic Gaussian wavefront in Eq.~(\ref{eq:gaussianSource}), but both approximate well when $\beta>>1$. An example of GSM 2D source combining 2$^\text{th}$ order mode in horizontal and 6$^\text{th}$ order mode in vertical is shown in Fig.~\ref{fig:GSM2D}.
+Note that the 0$^\text{th}$ mode is $E_0(x) \propto \exp(-c x^2) = \exp(-\sqrt{(16 \sigma_I^2)^{-1} + (4 \sigma_I^2 \beta^2)^{-1}} x^2)$ which in general differs from the basic Gaussian wavefront in Eq.~(\ref{eq:gaussianSource}), but both approximate well when $\beta \gg 1$. An example of GSM 2D source combining 2$^\text{th}$ order mode in horizontal and 6$^\text{th}$ order mode in vertical is shown in Fig.~\ref{fig:GSM2D}.
 The occupancy of coherent modes for the GSM is   
 \begin{equation}\label{eq:GSMoccupancy}
 \eta_i = q^i(1-q), 
@@ -261,11 +260,12 @@ W_{2D}(x_1,z_1,x_2,z_2;\omega) = W(x_1,x_2;\omega) W(z_1,z_2;\omega).
 \label{eq:CSD_2D}
 \end{equation}
 Each $W$ function is treated separately in a similar way affecting the $x$ (horizontal) and $z$ (vertical) coordinates.
-The eigenvalues and the coherent modes are solutions of the homogeneous Fredholm integral equation of second kind \cite{glass2017}. This is an eigenvalue problem, a diagonalization of the CSD.  In 1D, the CSD is a function of two variables, represented in a matrix that can be easily diagonalized using standard tools availables in python-numpy. The numerical calculation of $W(x_1,x_2)$ uses Kim's convolution theorem \cite{kim1986b} as described in \cite{glass2017}. 
-The 1D method  available in the WOFRY widget ``Undulator Coherent Mode Decomposition 1D" is described and tested in detail in \cite{SanchezdelRio2022CMD}.
+The eigenvalues and the coherent modes result from the diagonalization of the CSD.  In 1D, the CSD is a function of two variables, represented in a matrix that can be easily diagonalized using standard tools availables in python-numpy. 
+% The numerical calculation of $W(x_1,x_2)$ uses Kim's convolution theorem \cite{kim1986b} as described in \cite{glass2017}. 
+The 1D method  available in the WOFRY widget ``Undulator Coherent Mode Decomposition 1D" has been described and extensively tested in \cite{SanchezdelRio2022CMD}.
 
 % -----------------------------------------------------------------
-\subsection{``Undulator Gaussian 1D" widget} \todo{REMOVE? OR PROMOTE THE WIDGET FROM ALS ADDON TO MAIN WOFRY?}
+\subsection{``Undulator Gaussian 1D" widget} \todo{THIS SECTION COULD BE REMOVED. IT MAY NOT BE USEFUL AS WE HAVE BETTER MODELS. ALSO, THE WIDGET IS NOT AVAILABLE IN THE MAIN WOFRY (IT IS AVAILABLE IN THE ALS ADDON).}
 \label{sec:undulatorG}
 
 This aims to create a wavefront that ``approximates" the coherent emission (zero emittance) of an undulator at resonance.
@@ -295,15 +295,15 @@ For practical purposes, the Gaussian source approximation can be used for optica
 \label{sec:undulatorGSM}
 
 The real emission of the undulator is is very different than a Gaussian. However, the (inadequate) use of a Gaussian approximation for the undulator radiation is often found in literature, e.g.  \cite{coisson1997}.
-
 We have developed the ``Undulator Gaussian Shell-model 1D" widget
-aiming to compare the CMD of the undulator emission discussed before with the approximation given by GSM. However, there are several possible ways to match the undulator parameters to the GSM parameters $\sigma_I$ and $\sigma_\mu$. We explain here the methodology used in WOFRY. 
+aiming to compare the CMD of the undulator emission discussed before with the approximation given by GSM.
+% However, there are several possible ways to match the undulator parameters to the GSM parameters $\sigma_I$ and $\sigma_\mu$. We explain here the methodology used in WOFRY. 
 
 For representing the undulator radiation by a GSM, we need to obtain the $\sigma_I$ and $\sigma_\mu$ (or $\beta$) values. The intensity $\sigma_I$ matches the intensity distribution of the undulator source that is approximated as the convolution of the electron bunch size $\sigma_x$ with the radiation cross section $\sigma_u$. The other parameter $\beta$ is obtained by matching the GSM coherence fraction in Eq.~(\ref{eq:GSMcoherentfraction}) with the undulator coherence fraction approximated by
-\begin{equation}
+\begin{equation}\label{eq:CFphasespace}
     CF_u = \frac{\sigma_u\sigma_{u'}}{\sqrt{\sigma_x^2+\sigma_u^2}\sqrt{\sigma_{x'}^2+\sigma_{u'}^2}}.
 \end{equation}
-The resulting value for GSM $\beta$ that approximates the undulator emission is $\beta=CF_u/\sqrt{1-CF_u}$.
+The resulting value for GSM $\beta$ that approximates the undulator emission is $\beta=CF_u/\sqrt{1-CF_u}$ (obtained from Eq.~\ref{eq:GSMcoherentfraction}).
 
 There many arguments to prefer modeling undulators by using numeric CMD (section \ref{sec:CMD}) instead of the approximation by GSM. For instance, the small differences in a mode in terms of shape (even maintaining the same FWHM) may give to completely different results after propagation. Moreover, the GSM modes are real functions (constant phase) whereas the modes from CMD of undulator sources are complex functions (with a non-constant phase). A comparison between the 1D undulator CMD and this approximation of  undulator radiation by GSM is in section~\ref{sec:CMDvsGSM}
 
@@ -334,15 +334,17 @@ A generic aperture is a mask that transmits a part of the wavefront in a range $
 R(x;\omega) =
 \left\{
 \begin{matrix}
-A,  & \mbox{~~if~~} x_{min} \le x \le x_{max}
+A,  & \mbox{~~if~~} x_{min} \le x \le x_{max};
 \\ 
-1 - A, & \mbox{~~elsewhere}
+1 - A, & \mbox{~~elsewhere}.
 \end{matrix}
 \right.
 \end{equation}
 When the element is a slit, then $A=1$. If it is a beamstop, then $A=0$. For an aperture of finite length $a$ centered with the beam, $x_{min}=-a/2$ and $x_{max}=a/2$.
 
-A sometimes useful widget is the ``Gaussian Slit 1D" where $A=\exp(-x^2/(4\sigma_a))$ (note the factor 4 is because $\sigma_a$ is related to the intensity). The aperture acts as a Gaussian appodization window. Although artificial, it is interesting to shape the beam with a Gaussian profile, which remains a Gaussian after propagation. Therefore, a Gaussian slit acting on a plane wavefront does not produce diffraction fringes. Several recipes are proposed to relate $\sigma_a$ with the slit aperture $a=x_{max}-x_{min}$. The slit aperture matches the FWHM ($\sigma_a=a/2.355$).
+A useful widget is the ``Gaussian Slit 1D" where $A=\exp(-x^2/(4\sigma_a))$ (note the factor 4 is because $\sigma_a$ is related to the intensity). The aperture acts as a Gaussian appodization window. Although artificial, it is interesting to shape the beam with a Gaussian profile, which remains a Gaussian after propagation. Therefore, a Gaussian slit acting on a plane wavefront does not produce diffraction fringes. 
+% Several recipes are proposed to relate $\sigma_a$ with the slit aperture $a=x_{max}-x_{min}$.
+The slit $a$ aperture matches the FWHM, i.e. $\sigma_a=a/2.355$.
 
 % -----------------------------------------------------------------
 \subsection{Ideal lenses}
@@ -353,7 +355,7 @@ An ideal coupling of $N$ ideal lenses will present a focal length $f=(f_1^{-1}+f
 
 % -----------------------------------------------------------------
 \subsection{Thin objects}\label{sec:thinobject} 
-The ``Thin Object 1D" and ``Thin Object 2D" widgets permit to compute the modification of a wavefron (thus the absorption and focusing effects) by a layer of material (placed perpendicular to the beam) that is shaped with a height profile $h(x)$ in 1D ($h(x,z) in 2D$). The height profile is given in a mesh file. This is useful to add surface errors to lenses or other transmission elements, but they can also be used to define a full lens, or corrector, with an arbitrary profile.    
+The ``Thin Object 1D" and ``Thin Object 2D" widgets permit to compute the modification of a wavefron (thus the absorption and focusing effects) by a layer of material (placed perpendicular to the beam) that is shaped with a height profile $h(x)$ in 1D ($h(x,z)$ in 2D). The height profile is given in a mesh file. This is useful to add surface errors to lenses or other transmission elements, but they can also be used to define a full lens, a corrector, or an element with arbitrary profile.    
 
 A refractor made by a material with refraction index $n(\omega)=1-\delta(\omega)+i\beta(\omega)$ 
 and thickness profile $h(x)$ adds a phase to the wavefront $-\lambda \delta(\omega) h(x)$ and reduce its amplitude by $\exp(-\mu h(x)/2)$, where $\mu=(4 \pi/\lambda) \delta(\omega)$ is the (intensity) attenuation coefficient and $\lambda$ the photon wavelength. These expressions can be applied to profile $h(z)$ assuming valid the thin object approximation, i.e., assuming that the object is thin enough to avoid multiple scattering and diffraction in its bulk. 
@@ -417,7 +419,7 @@ This short example demonstrates the capabilities of WOFRY to make quick estimati
 % -----------------------------------------------------------------
 \subsection{Changes in the coherent fraction by a ``coherent slit"}
 We want to calculate how the coherent fraction at the source and after a slit. 
-We calculated the CMD of a U17 undulator in the EBS storage ring tuned at resonance of 15 keV, resulting a CF of  0.07 in H and 0.54 in V.  A calculation of the wavefront cropped by a slit of 50~$\mu$m placed a 20~ m is shown in (Fig.~\ref{fig:croppingslit}). The resulting transported modes are used to calculate the propagated CSD and then performing a new CMD (using the WOFRY widget ``Diagonalize Python Script""). After this operation, the resulting CF is 0.53 in H and 0.97 in V, just verifying that a cropping slit increases the beam coherent (the price to pay is the reduction of the intensity). A parametric calculation of the CF and transmission intensity as a function of the slit aperture is done and the results are displayed in Fig.~\ref{fig:slitscan}. This calculation permits to the beamline users to select the desired coherence fraction by selecting the appropriated slit aperture. 
+We calculated the CMD of a U17 undulator in the EBS storage ring tuned at resonance of 15 keV, resulting a CF of  0.07 in horizontal (H) and 0.54 in vertical (V).  A calculation of the wavefront cropped by a slit of 50~$\mu$m placed a 20~ m is shown in (Fig.~\ref{fig:croppingslit}). The resulting transported modes are used to calculate the propagated CSD and then performing a new CMD (using the WOFRY widget ``Diagonalize Python Script"). After this operation, the resulting CF is 0.53 in H and 0.97 in V, just verifying that a cropping slit increases the beam coherent (the price to pay is the reduction of the intensity). A parametric calculation of the CF and transmission intensity as a function of the slit aperture is done and the results are displayed in Fig.~\ref{fig:slitscan}. This calculation permits to the beamline users to select the desired coherence fraction by selecting the appropriated slit aperture. 
 
 \begin{figure}[H]
     \centering
@@ -432,59 +434,120 @@ We calculated the CMD of a U17 undulator in the EBS storage ring tuned at resona
 \end{figure}
 
 % -----------------------------------------------------------------
-\subsection{Undulator emission by numeric CMD versus approximated GSM}\label{sec:CMDvsGSM}
-We compare here the coherent mode decomposition for the U20 undulator (N=100, K=1.19) at the EBS storage ring. We performed CMD of the undulator radiation using the ``Undulator Coherent Mode Decomposition 1D" in Sec.~\ref{sec:CMD} and we also computed the undulator emission using the GSM with the ``Undulator GSM 1D" widget described in Sec.~\ref{sec:undulatorGSM}. 
-Results for the horizontal direction are in (Fig.~\ref{fig:GSMvsUND-H}) in (Fig.~\ref{fig:GSMvsUND-V}) for the vertical one. As expected, these figures shows that the GSM is a good approximation for cases where the coherence fraction is small (the horizontal case) but the results are very different, in particular the eigenfunctions (modes), in the case of high coherence (vertical direction in Fig.~\ref{fig:GSMvsUND-V}).
+\subsection{Comparison of undulator emission by numeric CMD with approximated GSM}\label{sec:CMDvsGSM}
+We compare here the coherent mode decomposition for the U20 undulator (N=100, K=1.19, first harmonic at 10 keV) at the EBS storage ring\footnote{We used the electron beam sizes and divergences 
+$\sigma_x$=\SI{30.18}{\micro\meter},
+$\sigma_{x'}$=\SI{4.37}{\micro\radian},
+$\sigma_y$=\SI{3.64}{\micro\meter},
+$\sigma_{y'}$=\SI{1.37}{\micro\radian},
+corresponding to beam emittances:  $\varepsilon_x$=\SI{132}{\pico\meter \radian},
+$\varepsilon_y$=\SI{5}{\pico\meter \radian}.
+}.
+We performed CMD of the undulator radiation using the ``Undulator Coherent Mode Decomposition 1D" in Sec.~\ref{sec:CMD} and we also computed the undulator emission using the GSM with the ``Undulator GSM 1D" widget described in Sec.~\ref{sec:undulatorGSM}. 
+
+The used method for calculating the GSM parameters matches the approximated undulator coherent fraction (Eq.~\ref{eq:CFphasespace}). The approximated CF approaches well the more accurate CMD for ``intermediate" emittance values. Fig.~\ref{fig:CFvsEmittance} compares the CF values given by the CMD with those given by Eq.~\ref{eq:CFphasespace}. It  is appreciated significative differences in the interval 5-50 pm. Indeed, for the values in use (132 pm in horizontal and 5 pm in vertical), the CF in horizontal are 0.09 (CMD) and 0.10 (GSM), showing a good agreement, but they discrepate in about 20\% in vertical: 0.60 (CMD) and 0.75 (GSM). 
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.25\textwidth]{figures/comparison_H_CSD_GSM.png}
-    \includegraphics[width=0.25\textwidth]{figures/comparison_H_CSD_U.png}
-    \newline
-    \includegraphics[width=0.3\textwidth]{figures/comparison_H_SD.png}
-    \newline
-    \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector0.png}
-    \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector1.png}
-    \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector2.png}
-    \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector3.png}
+    \includegraphics[width=0.65\textwidth]{figures/CFvsEmittance.pdf}
         
-    \caption{Comparison of the approximated (GSM) and exact (1D WOFRY) coherent mode decomposition  for the Horizontal direction of a U20 undulator of length \SI{2}{\meter},  set to resonance at 10 keV photon. energy. The plot show the Cross Spectral Deisity, Spectral Density, and four first modes. The Coherence Fraction is 0.088}
-    \label{fig:GSMvsUND-H}
+    \caption{Comparison of the coherent fraction calculated using the CMD and approximated value (Eq.~\ref{eq:CFphasespace}) versus emittance.}
+    \label{fig:CFvsEmittance}
 \end{figure}
 
 
-\begin{figure}
+The spectral densities are similar for the exact and GSM calculation (Fig.~\ref{fig:GSMvsUND}), but it can be appreciated differences in the cross-spectral density for the vertical direction.
+When the beams are propagated at a distance \SI{30}{meter} downstream from the source, a large disagreement between the exact and GSM is found (Fig.~\ref{fig:GSMvsUND-propagated}). This is certainly due to the fact that the propagation of the undulator beam is very different than the propagation of the GSM, even if, as shown in Fig.~\ref{sec:CMDvsGSM}, the beams at the source present a reasonably good agreement. The GSM would work only for cases where the coherence fraction is very small like in the old generations of synchrotron sources.
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.25\textwidth]{figures/comparison_V_CSD_GSM.png}
-    \includegraphics[width=0.25\textwidth]{figures/comparison_V_CSD_U.png}
-    \newline
-    \includegraphics[width=0.3\textwidth]{figures/comparison_V_SD.png}
-    \newline
-    \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector0.png}
-    \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector1.png}
-    \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector2.png}
-    \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector3.png}
+~~~~~~~~~~~~~~~~~~~a1)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~a2)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~a3)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    \includegraphics[width=0.25\textwidth]{figures/CMD_H.png}
+    \includegraphics[width=0.25\textwidth]{figures/GSM_H.png}
+    \includegraphics[width=0.45\textwidth]{figures/SD_H.png}\\
+~~~~~~~~~~~~~~~~~~~b1)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~b2)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~b3)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    \includegraphics[width=0.25\textwidth]{figures/CMD_V.png}
+    \includegraphics[width=0.25\textwidth]{figures/GSM_V.png}
+    \includegraphics[width=0.45\textwidth]{figures/SD_V.png}
+
         
-    \caption{The same as Fig.~\ref{fig:GSMvsUND-H} but for the vertical direction. The Coherence Fraction is 0.665}
-    \label{fig:GSMvsUND-V}
+    \caption{Comparison of the Cross Spectral Density (CSD) and Spectral Density (SD) calculated by numerical coherent mode decomposition and approximated by the Gaussian Shell-model for the horizontal (H) and vertical (V) directions of a U20 undulator of length \SI{2}{\meter},  set to resonance at 10 keV photon energy.
+    Legend:
+    a1) CSD by numerical CDM in H,
+    a2) CSD by GSM-approximation in H,
+    a3) SD comparison in H;
+    b1) CSD by numerical CMD in V,
+    b2) CSD by GSM-approximation in V,
+    b3) SD comparison in V.
+    }
+    \label{fig:GSMvsUND}
 \end{figure}
-\todo{REDO the figures, check again thenumerical values.}
 
 
-\todo{In Fig.~\ref{fig:GSMvsCOMSYL} we compare the occupation spectrum calculated by CMD and approximated by GSM. It shows that the GSM approximated very well an undulator only the fist mode (it must be the case because the GSM approximation to the undulator is built matching the CF). The occupancy of higher modes differ: the first 50 GSM modes GSM to contain more than 99\% of the spectral density, but XX are needed for the numerical CMD. This means significative errors in the eigenvalues when using GSM. 
-
-
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/FigureGSMvsCOMSYL.png}
-    \caption{\todo{REDO this figure with CMD 1D}Comparison of the approximated (GSM) and exact (COMSYL) cumulated occupation of the coherent modes for an undulator U20, of length \SI{2}{\meter}, and set to resonance at 10 keV photon. energy.}
-    \label{fig:GSMvsCOMSYL}
-\end{figure}
-}
+    ~~~~~~~~~~~~~~~~~~~a1)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~a2)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~a3)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    \includegraphics[width=0.25\textwidth]{figures/CMD_H-propagated.png}
+    \includegraphics[width=0.25\textwidth]{figures/GSM_H-propagated.png}
+    \includegraphics[width=0.45\textwidth]{figures/SD_H-propagated.png}\\
+~~~~~~~~~~~~~~~~~~~b1)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~b2)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~b3)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+    \includegraphics[width=0.25\textwidth]{figures/CMD_V-propagated.png}
+    \includegraphics[width=0.25\textwidth]{figures/GSM_V-propagated.png}
+    \includegraphics[width=0.45\textwidth]{figures/SD_V-propagated.png}
 
-% -----------------------------------------------------------------
-\subsection{Coherent fraction out of resonance}
-\todo{Juan, do you want to add your some of your simulations here? }
+        
+    \caption{The same as in Fig.~\ref{fig:GSMvsUND} but propagated to a plane placed at \SI{30}{m} downstream from the source.
+    }
+    \label{fig:GSMvsUND-propagated}
+\end{figure}
+
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_CSD_GSM.png}
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_CSD_U.png}
+%     \newline
+%     \includegraphics[width=0.3\textwidth]{figures/comparison_H_SD.png}
+%     \newline
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector0.png}
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector1.png}
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector2.png}
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector3.png}
+        
+%     \caption{Comparison of the approximated (GSM) and exact (1D WOFRY) coherent mode decomposition  for the Horizontal direction of a U20 undulator of length \SI{2}{\meter},  set to resonance at 10 keV photon. energy. The plot show the Cross Spectral Deisity, Spectral Density, and four first modes. The Coherence Fraction is 0.088}
+%     \label{fig:GSMvsUND-H}
+% \end{figure}
+
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_CSD_GSM.png}
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_CSD_U.png}
+%     \newline
+%     \includegraphics[width=0.3\textwidth]{figures/comparison_V_SD.png}
+%     \newline
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector0.png}
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector1.png}
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector2.png}
+%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector3.png}
+        
+%     \caption{The same as Fig.~\ref{fig:GSMvsUND-H} but for the vertical direction. The Coherence Fraction is 0.665}
+%     \label{fig:GSMvsUND-V}
+% \end{figure}
+% \todo{REDO the figures, check again thenumerical values.}
+
+
+% \todo{
+% In Fig.~\ref{fig:GSMvsCOMSYL} we compare the occupation spectrum calculated by CMD and approximated by GSM. It shows that the GSM approximated very well an undulator only the fist mode (it must be the case because the GSM approximation to the undulator is built matching the CF). The occupancy of higher modes differ: the first 50 GSM modes GSM to contain more than 99\% of the spectral density, but XX are needed for the numerical CMD. This means significative errors in the eigenvalues when using GSM. 
+
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.5\textwidth]{figures/FigureGSMvsCOMSYL.png}
+%     \caption{\todo{REDO this figure with CMD 1D}Comparison of the approximated (GSM) and exact (COMSYL) cumulated occupation of the coherent modes for an undulator U20, of length \SI{2}{\meter}, and set to resonance at 10 keV photon. energy.}
+%     \label{fig:GSMvsCOMSYL}
+% \end{figure}
+% }
 
 
 
@@ -496,7 +559,7 @@ WOFRY has played a crucial role in numerous studies, also contributing to the en
 % -----------------------------------------------------------------
 \section{Summary and conclusions}
 \label{sec:summary}
-xxx
+In this paper we describe the models implemented in WOFRY (Wave Optics FRamework in pYthon), a wave optics toolbox. It implements a useful model for computing the coherence parameters of synchrotron beamlines, like cross-spectral density and coherent fraction. The software is included in the OASYS\cite{OASYS} suite. We have illustrated the applicability of WOFRY with some examples, from simple diffraction limited waves, to computing the coherent fraction using ``coherent slits". Moreover WOFRY also implements the undulator radiation approximated by the Gaussian Shell-model. In section~\ref{ec:CMDvsGSM} we compare this method with the more exact undulator radiation by numerical coherent mode decomposition. It is shown that, although GSM may reproduce reasonably well the beam characteristics at the source position, but after propagation the differences become important. This 
 
 
 
