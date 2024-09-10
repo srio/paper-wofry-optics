@@ -46,7 +46,7 @@ The software developed is available in the OASYS\cite{OASYS} suite.
 % (WOFRY add-on), an adaptable, customizable and efficient beamline modeling platform. It facilitates the automatic generation of scripts, which can be utilized, for instance, in generating synthetic data to feed into AI tools. 
 \end{abstract}
 
-\newpage
+% \newpage
 
 % -----------------------------------------------------------------
 % -----------------------------------------------------------------
@@ -80,7 +80,8 @@ The wavefront is represented by the electric field $E$ of a monochromatic compon
 This electric field or electric disturbance is a complex scalar $E(x;y=0,\omega)$. It can be also expressed by two real numbers, and amplitude $A$ and a phase $\phi$,  $E= A \exp{(i\phi)}$. In the case of polarized beams, two complex scalars, $E_\sigma$ and $E_\pi$ are used for $\sigma$ and $\pi$ polarization, respectively.
 The wavefront intensity is the square of the modulus of the amplitude: $I=|E|^2=|E_\sigma|^2 + |E_\pi|^2$. In WOFRY, the wavefront is an array of complex numbers over a discretized mesh. 1D wavefronts are $E(x_i;y,\omega)$ and 2D wavefronts are $E(x_i,z_j;y,\omega)$. Every wavefront is defined at a position $y$ and for a photon energy $\omega$. This dependency is not explicit in the following.
 
-The wavefront evolves when transported in free space. A propagator computes a wavefront $E(x;y_2)$ in a point $y_2$ knowing the wavefront in another position $E(x;y_1)$ and the distance $\Delta$ in free space $y_2 = y_1 + \Delta$. WOFRY has implemented two propagators, described here. \todo{CHECK THE CONSTANT TERM}
+The wavefront evolves when transported in free space. A propagator computes a wavefront $E(x;y_2)$ in a point $y_2$ knowing the wavefront in another position $E(x;y_1)$ and the distance $\Delta$ in free space $y_2 = y_1 + \Delta$. WOFRY has implemented two propagators, described here.
+% \todo{CHECK THE CONSTANT TERM}
 
 % -----------------------------------------------------------------
 \subsection{Direct implementation of integral Rayleigh-Sommerfeld propagator}
@@ -91,7 +92,7 @@ The Rayleigh-Sommerfeld propagator for small-angle approximation expresses the e
 E(\vec{r}') =  \frac{k}{2 \pi i} \int \frac{E(\vec{r})}{|\vec{r}'-\vec{r}|} e^{ i k |\vec{r}' - \vec{r}|  }  d\Sigma,
 \end{equation}
 where the integral is made over the domain of the source (the surface $\Sigma$). 
-This propagator can be applied to numerical discrete 1D wavefronts, and the integral reduces to a sum
+This propagator can be applied to numeric discrete 1D wavefronts, and the integral reduces to a sum
 \begin{equation}\label{eq:discreteRSpropagator}
 E(x_2;y_2) = \frac{e^{i k \Delta}}{\sqrt{2 \pi i \Delta}}  \sum_{i=0}^{N-1}  E(x_{1,i};y_1) e^{i k \sqrt{(x_2 - x_{1,i})^2 + \Delta^2} }.
 \end{equation}
@@ -265,7 +266,8 @@ The eigenvalues and the coherent modes result from the diagonalization of the CS
 The 1D method  available in the WOFRY widget ``Undulator Coherent Mode Decomposition 1D" has been described and extensively tested in \cite{SanchezdelRio2022CMD}.
 
 % -----------------------------------------------------------------
-\subsection{``Undulator Gaussian 1D" widget} \todo{THIS SECTION COULD BE REMOVED. IT MAY NOT BE USEFUL AS WE HAVE BETTER MODELS. ALSO, THE WIDGET IS NOT AVAILABLE IN THE MAIN WOFRY (IT IS AVAILABLE IN THE ALS ADDON).}
+\subsection{``Undulator Gaussian 1D" widget}
+% \todo{THIS SECTION COULD BE REMOVED. IT MAY NOT BE USEFUL AS WE HAVE BETTER MODELS. ALSO, THE WIDGET IS NOT AVAILABLE IN THE MAIN WOFRY (IT IS AVAILABLE IN THE ALS ADDON).}
 \label{sec:undulatorG}
 
 This aims to create a wavefront that ``approximates" the coherent emission (zero emittance) of an undulator at resonance.
@@ -471,12 +473,12 @@ When the beams are propagated at a distance \SI{30}{meter} downstream from the s
     \includegraphics[width=0.45\textwidth]{figures/SD_V.png}
 
         
-    \caption{Comparison of the Cross Spectral Density (CSD) and Spectral Density (SD) calculated by numerical coherent mode decomposition and approximated by the Gaussian Shell-model for the horizontal (H) and vertical (V) directions of a U20 undulator of length \SI{2}{\meter},  set to resonance at 10 keV photon energy.
+    \caption{Comparison of the Cross Spectral Density (CSD) and Spectral Density (SD) calculated by numeric coherent mode decomposition and approximated by the Gaussian Shell-model for the horizontal (H) and vertical (V) directions of a U20 undulator of length \SI{2}{\meter},  set to resonance at 10 keV photon energy.
     Legend:
-    a1) CSD by numerical CDM in H,
+    a1) CSD by numeric CDM in H,
     a2) CSD by GSM-approximation in H,
     a3) SD comparison in H;
-    b1) CSD by numerical CMD in V,
+    b1) CSD by numeric CMD in V,
     b2) CSD by GSM-approximation in V,
     b3) SD comparison in V.
     }
@@ -484,7 +486,7 @@ When the beams are propagated at a distance \SI{30}{meter} downstream from the s
 \end{figure}
 
 
-\begin{figure}[H]
+\begin{figure}
     \centering
     ~~~~~~~~~~~~~~~~~~~a1)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~a2)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~a3)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     \includegraphics[width=0.25\textwidth]{figures/CMD_H-propagated.png}
@@ -559,7 +561,7 @@ WOFRY has played a crucial role in numerous studies, also contributing to the en
 % -----------------------------------------------------------------
 \section{Summary and conclusions}
 \label{sec:summary}
-In this paper we describe the models implemented in WOFRY (Wave Optics FRamework in pYthon), a wave optics toolbox. It implements a useful model for computing the coherence parameters of synchrotron beamlines, like cross-spectral density and coherent fraction. The software is included in the OASYS\cite{OASYS} suite. We have illustrated the applicability of WOFRY with some examples, from simple diffraction limited waves, to computing the coherent fraction using ``coherent slits". Moreover WOFRY also implements the undulator radiation approximated by the Gaussian Shell-model. In section~\ref{ec:CMDvsGSM} we compare this method with the more exact undulator radiation by numerical coherent mode decomposition. It is shown that, although GSM may reproduce reasonably well the beam characteristics at the source position, but after propagation the differences become important. This 
+In this paper we describe the models implemented in WOFRY (Wave Optics FRamework in pYthon), a wave optics toolbox. It implements a useful model for computing the coherence parameters of synchrotron beamlines, like cross-spectral density and coherent fraction. The software is included in the OASYS\cite{OASYS} suite. We have illustrated the applicability of WOFRY with some examples, from simple diffraction limited waves, to computing the coherent fraction using ``coherent slits". Moreover WOFRY also implements the undulator radiation approximated by the Gaussian Shell-model. In section~\ref{ec:CMDvsGSM} we compare this method with the more exact undulator radiation by numeric coherent mode decomposition. It is shown that, although GSM may reproduce reasonably well the beam characteristics at the source position, but after propagation the differences become important. This 
 
 
 
