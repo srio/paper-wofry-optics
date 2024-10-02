@@ -245,7 +245,7 @@ From here one can calculate the number of modes needed to reach a cumulated occu
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.49\textwidth]{figures/GSM2D.png}
+    \includegraphics[width=0.69\textwidth]{figures/GSM2D.png}
         
     \caption{Example of a 2D GSM source created with the ``Generic Wavefront 2D" widget.}
     \label{fig:GSM2D}
@@ -414,7 +414,7 @@ This short example demonstrates the capabilities of WOFRY to make quick estimati
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{figures/diffractionlimited.png}
+    \includegraphics[width=0.99\textwidth]{figures/diffractionlimited.png}
     \caption{Example of diffraction limited spot of a wavefront focused to a point. Three equivalent systems give the same result: i) a collapsing convergent spherical wavefront (radius D), ii) a plane wave focused by an ideal lens of focal $D$, and iii) a divergent spherical wave (radius R) focused by an ideal lens of focal $D/2$.   }\label{fig:diffractionlimited}
 \end{figure}
 
@@ -432,7 +432,7 @@ We calculated the CMD of a U17 undulator in the EBS storage ring tuned at resona
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.55\textwidth]{figures/CFvsGap.pdf}
+    \includegraphics[width=0.75\textwidth]{figures/CFvsGap.pdf}
     \caption{Variation of the coherent fraction versus slit aperture for the system presented in Fig.~\ref{fig:croppingslit}.   }\label{fig:slitscan}
 \end{figure}
 
@@ -452,7 +452,7 @@ The used method for calculating the GSM parameters matches the approximated undu
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.65\textwidth]{figures/CFvsEmittance.pdf}
+    \includegraphics[width=0.95\textwidth]{figures/CFvsEmittance.pdf}
         
     \caption{Comparison of the coherent fraction calculated using the CMD and approximated value (Eq.~\ref{eq:CFphasespace}) versus emittance.}
     \label{fig:CFvsEmittance}
@@ -461,6 +461,11 @@ The used method for calculating the GSM parameters matches the approximated undu
 
 The spectral densities are similar for the exact and GSM calculation (Fig.~\ref{fig:GSMvsUND}), but it can be appreciated differences in the cross-spectral density for the vertical direction.
 When the beams are propagated at a distance \SI{30}{meter} downstream from the source, a large disagreement between the exact and GSM is found (Fig.~\ref{fig:GSMvsUND-propagated}). This is certainly due to the fact that the propagation of the undulator beam is very different than the propagation of the GSM, even if, as shown in Fig.~\ref{sec:CMDvsGSM}, the beams at the source present a reasonably good agreement. The GSM would work only for cases where the coherence fraction is very small like in the old generations of synchrotron sources.
+
+% -----------------------------------------------------------------
+\subsection{Other systems calculated with WOFRY}
+
+WOFRY has played a crucial role in numerous studies, also contributing to the enhancement and optimization of the code and algorithms. Examples include analyzing the efficacy of adaptive X-ray optics in correcting mirror deformations induced by heat load \citep{SanchezdelRio2020}, studying modifications in beam focus due to cropping partially coherent X-ray beams \citep{SanchezdelRio2022EPL}, and assessing beam quality after reflection by a toroidal mirror in a 4th generation storage-ring beamline \citep{ReyesHerrera2023}.
 
 \begin{figure}[H]
     \centering
@@ -474,20 +479,19 @@ When the beams are propagated at a distance \SI{30}{meter} downstream from the s
     \includegraphics[width=0.45\textwidth]{figures/SD_V.png}
 
         
-    \caption{Comparison of the Cross Spectral Density (CSD) and Spectral Density (SD) calculated by numeric coherent mode decomposition and approximated by the Gaussian Shell-model for the horizontal (H) and vertical (V) directions of a U20 undulator of length \SI{2}{\meter},  set to resonance at 10 keV photon energy.
-    Legend:
-    a1) CSD by numeric CDM in H,
-    a2) CSD by GSM-approximation in H,
-    a3) SD comparison in H;
-    b1) CSD by numeric CMD in V,
-    b2) CSD by GSM-approximation in V,
-    b3) SD comparison in V.
+    \caption{Comparison of the Cross Spectral Density (CSD) and Spectral Density (SD) calculated by numeric coherent mode decomposition and approximated by the Gaussian Shell-model for the horizontal (H) and vertical (V) directions of a U20 undulator of length \SI{2}{\meter} at 10 keV.
+    % Legend:
+    a1) CSD by CDM in H,
+    a2) CSD by GSM in H,
+    a3) SD in H;
+    b1) CSD by CMD in V,
+    b2) CSD by GSM in V,
+    b3) SD in V.
     }
     \label{fig:GSMvsUND}
 \end{figure}
 
-
-\begin{figure}
+\begin{figure}[H]
     \centering
     ~~~~~~~~~~~~~~~~~~~a1)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~a2)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~a3)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
     \includegraphics[width=0.25\textwidth]{figures/CMD_H-propagated.png}
@@ -503,61 +507,6 @@ When the beams are propagated at a distance \SI{30}{meter} downstream from the s
     }
     \label{fig:GSMvsUND-propagated}
 \end{figure}
-
-
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_CSD_GSM.png}
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_CSD_U.png}
-%     \newline
-%     \includegraphics[width=0.3\textwidth]{figures/comparison_H_SD.png}
-%     \newline
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector0.png}
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector1.png}
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector2.png}
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_H_eigenvector3.png}
-        
-%     \caption{Comparison of the approximated (GSM) and exact (1D WOFRY) coherent mode decomposition  for the Horizontal direction of a U20 undulator of length \SI{2}{\meter},  set to resonance at 10 keV photon. energy. The plot show the Cross Spectral Deisity, Spectral Density, and four first modes. The Coherence Fraction is 0.088}
-%     \label{fig:GSMvsUND-H}
-% \end{figure}
-
-
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_CSD_GSM.png}
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_CSD_U.png}
-%     \newline
-%     \includegraphics[width=0.3\textwidth]{figures/comparison_V_SD.png}
-%     \newline
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector0.png}
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector1.png}
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector2.png}
-%     \includegraphics[width=0.25\textwidth]{figures/comparison_V_eigenvector3.png}
-        
-%     \caption{The same as Fig.~\ref{fig:GSMvsUND-H} but for the vertical direction. The Coherence Fraction is 0.665}
-%     \label{fig:GSMvsUND-V}
-% \end{figure}
-% \todo{REDO the figures, check again thenumerical values.}
-
-
-% \todo{
-% In Fig.~\ref{fig:GSMvsCOMSYL} we compare the occupation spectrum calculated by CMD and approximated by GSM. It shows that the GSM approximated very well an undulator only the fist mode (it must be the case because the GSM approximation to the undulator is built matching the CF). The occupancy of higher modes differ: the first 50 GSM modes GSM to contain more than 99\% of the spectral density, but XX are needed for the numerical CMD. This means significative errors in the eigenvalues when using GSM. 
-
-
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=0.5\textwidth]{figures/FigureGSMvsCOMSYL.png}
-%     \caption{\todo{REDO this figure with CMD 1D}Comparison of the approximated (GSM) and exact (COMSYL) cumulated occupation of the coherent modes for an undulator U20, of length \SI{2}{\meter}, and set to resonance at 10 keV photon. energy.}
-%     \label{fig:GSMvsCOMSYL}
-% \end{figure}
-% }
-
-
-
-% -----------------------------------------------------------------
-\subsection{Other systems calculated with WOFRY}
-
-WOFRY has played a crucial role in numerous studies, also contributing to the enhancement and optimization of the code and algorithms. Examples include analyzing the efficacy of adaptive X-ray optics in correcting mirror deformations induced by heat load \citep{SanchezdelRio2020}, studying modifications in beam focus due to cropping partially coherent X-ray beams \citep{SanchezdelRio2022EPL}, and assessing beam quality after reflection by a toroidal mirror in a 4th generation storage-ring beamline \citep{ReyesHerrera2023}.
 
 % -----------------------------------------------------------------
 \section{Summary and conclusions}
