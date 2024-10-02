@@ -12,6 +12,7 @@
 \usepackage{url}
 \usepackage{natbib}
 \usepackage{float}
+\usepackage{natbib}
 
 \newcommand{\todo}[1]{{\color{red}[TODO: "#1'']}}
 \newcommand{\remove}[1]{ {\color{blue} \sout{#1}}}
@@ -41,7 +42,7 @@
 % -----------------------------------------------------------------
 \begin{abstract}
 We present WOFRY (Wave Optics FRamework in pYthon), a specialized toolbox designed for wave optics modeling, with particular emphasis on partial coherence. This package is tailored to assist synchrotron scientists and engineers in the prototyping and modeling of X-ray sources and optics. WOFRY offers functionalities for generating and propagating 1D and 2D wavefronts, along with various tools for interacting with different optical elements.
-The software developed is available in the OASYS\cite{OASYS} suite.
+The software developed is available in the OASYS \citep{OASYS} suite.
 %
 % (WOFRY add-on), an adaptable, customizable and efficient beamline modeling platform. It facilitates the automatic generation of scripts, which can be utilized, for instance, in generating synthetic data to feed into AI tools. 
 \end{abstract}
@@ -56,11 +57,11 @@ The software developed is available in the OASYS\cite{OASYS} suite.
 
 Wavefront simulations are getting more and more interest in 4th generation synchrotron facilities for simulating optical devices and instruments. Fully coherent sources, or sources with very high coherence fraction can be represented by a single wavefront. However, most 4th generation storage-ring-based sources working in the X-ray regime are not completely coherent, with coherence fraction of the order of 10\% or less. Therefore partial coherence models are necessary, representing the source with multiple wavefronts. 
 
-Several codes exist in the synchrotron community for physical optics calculations, like SRW\cite{codeSRW}, XRT\cite{XRT}, WISE\cite{wise}, MOI\cite{MOI}, etc. with different implementations, each featuring pros and cons, but none of them satisfy all our requirements. The objectives that drove us to develop WOFRY are i) the need of a fast a quick prototyping of a complete beamline using physical optics, ii) run it in a powerful and simple user interface, iii) light enough to run in a laptop, iv) model accurately the partial coherence (including coherent fraction along the beamline), v) exact simulation the surface errors in mirrors and lenses, and vi) automatic generation of scripts that could be used in cloud computing.    
+Several codes exist in the synchrotron community for physical optics calculations, like SRW \citep{codeSRW}, XRT \citep{XRT}, WISE \citep{wise}, MOI \citep{MOI}, etc. with different implementations, each featuring pros and cons, but none of them satisfy all our requirements. The objectives that drove us to develop WOFRY are i) the need of a fast a quick prototyping of a complete beamline using physical optics, ii) run it in a powerful and simple user interface, iii) light enough to run in a laptop, iv) model accurately the partial coherence (including coherent fraction along the beamline), v) exact simulation the surface errors in mirrors and lenses, and vi) automatic generation of scripts that could be used in cloud computing.    
 
-WOFRY is built upon a framework library \cite{syned} featuring key components such as the ``Propagation Manager" and ``Propagator" objects, which serve as the interface to wavefront propagation algorithms, providing a high-level representation of the propagation mechanism of wavefronts.
-In terms of source simulation, WOFRY goes beyond basic plane, spherical and Gaussian waves. It makes calculation of partial coherence using not only the Gaussian Shell-model but also performs coherent mode decomposition of undulator radiation\cite{SanchezdelRio2022CMD}.
-Several optical elements are implemented, including absorbers (slits and stops), reflectors (mirrors and gratings), and refractors (ideal lenses, real lenses, compound refractive lenses, and thin objects \cite{Celestre2019}). The physical models and algorithms implemented in the different components of WOFRY are presented in this paper. 
+WOFRY is built upon a framework library \citep{syned} featuring key components such as the ``Propagation Manager" and ``Propagator" objects, which serve as the interface to wavefront propagation algorithms, providing a high-level representation of the propagation mechanism of wavefronts.
+In terms of source simulation, WOFRY goes beyond basic plane, spherical and Gaussian waves. It makes calculation of partial coherence using not only the Gaussian Shell-model but also performs coherent mode decomposition of undulator radiation \citep{SanchezdelRio2022CMD}.
+Several optical elements are implemented, including absorbers (slits and stops), reflectors (mirrors and gratings), and refractors (ideal lenses, real lenses, compound refractive lenses, and thin objects \citep{Celestre2019}). The physical models and algorithms implemented in the different components of WOFRY are presented in this paper. 
 
 
 
@@ -87,7 +88,7 @@ The wavefront evolves when transported in free space. A propagator computes a wa
 \subsection{Direct implementation of integral Rayleigh-Sommerfeld propagator}
 \label{sec:integralPropagator}
 
-The Rayleigh-Sommerfeld propagator for small-angle approximation expresses the electric field at a spatial point $\vec{r}'$ as an integral of the electric field at a spatial point $\vec{r}$ \cite{goodmanfourier}
+The Rayleigh-Sommerfeld propagator for small-angle approximation expresses the electric field at a spatial point $\vec{r}'$ as an integral of the electric field at a spatial point $\vec{r}$ \citep{goodmanfourier}
 \begin{equation}\label{eq:RSpropagator}
 E(\vec{r}') =  \frac{k}{2 \pi i} \int \frac{E(\vec{r})}{|\vec{r}'-\vec{r}|} e^{ i k |\vec{r}' - \vec{r}|  }  d\Sigma,
 \end{equation}
@@ -108,9 +109,9 @@ The Fresnel propagator is obtained by making a Taylor expansion of the quadratic
 \begin{equation}\label{eq:fresnelPropagator}
 E(x;y_2) =  \frac{e^{i k \Delta}}{\sqrt{i \lambda \Delta}} \int E(x';y_1) e^{ \frac{i k}{2 \Delta}  (x-x')^2  }  dx'.
 \end{equation}
-The Fresnel integral propagator can be seen as convolution of the wavefield with a Gaussian kernel. One can write Eq. (\ref{eq:fresnelPropagator}) in convolution form \cite{goodmanfourier}, involving a Fourier transform $\mathcal{F}$ and an inverse Fourier transform $\mathcal{F}^{-1}$. The real benefit of using this scheme comes from the use of Fast Fourier Transforms, that reduce the number of operations from $N^2$ to $N \log_2 N$. Its use is essential when doing simulations in 2D, because the direct calculation of the integral lead to $N^4$ operations at the limit of calculation power of usual laptop computers.
+The Fresnel integral propagator can be seen as convolution of the wavefield with a Gaussian kernel. One can write Eq. (\ref{eq:fresnelPropagator}) in convolution form \citep{goodmanfourier}, involving a Fourier transform $\mathcal{F}$ and an inverse Fourier transform $\mathcal{F}^{-1}$. The real benefit of using this scheme comes from the use of Fast Fourier Transforms, that reduce the number of operations from $N^2$ to $N \log_2 N$. Its use is essential when doing simulations in 2D, because the direct calculation of the integral lead to $N^4$ operations at the limit of calculation power of usual laptop computers.
 % In WOFRY we permit different windows for the incident and transported wavefronts, which is interesting when propagating highly divergent or converging wavefronts.
-It is possible to calculate the propagated field in a ``zoomed'' window, thus permitting optimizing the wavefront sampling in cases for propagating highly convergent or divergent wavefronts. This is implemented using the method proposed in \cite{schmidt}. The problem reduces to a convolution problem of the unpropagated field field $E(x;y_0)$ affected by a phase $P$ with a kernel $K$, and the result affected by a global phase $P^G$
+It is possible to calculate the propagated field in a ``zoomed'' window, thus permitting optimizing the wavefront sampling in cases for propagating highly convergent or divergent wavefronts. This is implemented using the method proposed in \citep{schmidt}. The problem reduces to a convolution problem of the unpropagated field field $E(x;y_0)$ affected by a phase $P$ with a kernel $K$, and the result affected by a global phase $P^G$
 %
 % \begin{equation}\label{eq:fft}
 % E(x; y_1) = P^G \mathcal{F}^{-1}\Big\{ \mathcal{F}\{E\} K \Big\},
@@ -133,7 +134,7 @@ P = e^{i \frac{k}{2\Delta} (1-m_x)x_1^2 },
 \begin{equation}
 K = e^{-i \pi \lambda \Delta \frac{u^2}{m_x} }.
 \end{equation}
-The term $m_x$ is the magnification (zoom) factor. WOFRY also implements the zoom propagator in 2D, with different magnifications in horizontal and vertical directions, described in \cite{pirro}.
+The term $m_x$ is the magnification (zoom) factor. WOFRY also implements the zoom propagator in 2D, with different magnifications in horizontal and vertical directions, described in \citep{pirro}.
 
 
 % -----------------------------------------------------------------
@@ -193,7 +194,7 @@ W(x_1,x_2;\omega) = A^2 e^{-(x_1^2+x_2^2)/(4 \sigma_I^2)} e^{-(x_2-x_1)^2/(2 \si
 with $A$ a constant, and $\sigma_I$ and $\sigma_\mu$ are related to ``intensity" and  ``coherence" widths. All are positive constants. 
 
 In Optics, the expansion of a generic CSD in a series of orthonormal polynomials is called coherent mode decomposition (CMD)  
-\cite{mandel_wolf}
+\citep{mandel_wolf}
 \begin{equation}
 W(x_1,x_2;\omega) = \sum_{n=0}^{\infty} \lambda_n(\omega) \Phi_n^*(x_1;\omega) \Phi_n(x_2;\omega). 
 \label{CMD}
@@ -210,7 +211,7 @@ The occupancy $\eta$ of the i-th mode is defined as the ratio of its intensity t
 \end{equation}
 The Coherent Fraction ($CF$) is the occupancy of the first coherent mode $CF=\eta_0$.
 
-The CSD of the GSM in Eq.~(\ref{GS_CSD}) can be expanded analytically in coherent modes \cite{Starikov82}. The resulting eigenvalues are
+The CSD of the GSM in Eq.~(\ref{GS_CSD}) can be expanded analytically in coherent modes \citep{Starikov82}. The resulting eigenvalues are
 \begin{align}
 \lambda_0 &= A \sqrt{\pi/( a+b+c)}; \\ 
 \lambda_n &= \lambda_0 q ^n,
@@ -254,7 +255,7 @@ From here one can calculate the number of modes needed to reach a cumulated occu
 \subsection{``Undulator Coherent Mode Decomposition 1D" widget}
 \label{sec:CMD}
 
-A full model for coherent mode decomposition in 2D was proposed and implemented in the COMSYL code \cite{glass2017}. The calculation of the CSD and its expansion in normal modes is a complex and heavy task that requires long calculations in supercomputers. 
+A full model for coherent mode decomposition in 2D was proposed and implemented in the COMSYL code \citep{glass2017}. The calculation of the CSD and its expansion in normal modes is a complex and heavy task that requires long calculations in supercomputers. 
 An important reduction in the calculation effort is obtained with 1D model of the waves. In this model we suppose that the CSD is separable in its 1D horizontal $x$ and vertical $z$ coordinates, therefore the $W_{2D}$ becomes a product of two CSD functions $W$ of two variables for a given photon frequency $\omega$:
 \begin{equation}
 W_{2D}(x_1,z_1,x_2,z_2;\omega) = W(x_1,x_2;\omega) W(z_1,z_2;\omega).
@@ -262,8 +263,8 @@ W_{2D}(x_1,z_1,x_2,z_2;\omega) = W(x_1,x_2;\omega) W(z_1,z_2;\omega).
 \end{equation}
 Each $W$ function is treated separately in a similar way affecting the $x$ (horizontal) and $z$ (vertical) coordinates.
 The eigenvalues and the coherent modes result from the diagonalization of the CSD.  In 1D, the CSD is a function of two variables, represented in a matrix that can be easily diagonalized using standard tools availables in python-numpy. 
-% The numerical calculation of $W(x_1,x_2)$ uses Kim's convolution theorem \cite{kim1986b} as described in \cite{glass2017}. 
-The 1D method  available in the WOFRY widget ``Undulator Coherent Mode Decomposition 1D" has been described and extensively tested in \cite{SanchezdelRio2022CMD}.
+% The numerical calculation of $W(x_1,x_2)$ uses Kim's convolution theorem \citep{kim1986b} as described in \citep{glass2017}. 
+The 1D method  available in the WOFRY widget ``Undulator Coherent Mode Decomposition 1D" has been described and extensively tested in \citep{SanchezdelRio2022CMD}.
 
 % -----------------------------------------------------------------
 \subsection{``Undulator Gaussian 1D" widget}
@@ -271,7 +272,7 @@ The 1D method  available in the WOFRY widget ``Undulator Coherent Mode Decomposi
 \label{sec:undulatorG}
 
 This aims to create a wavefront that ``approximates" the coherent emission (zero emittance) of an undulator at resonance.
-A single electron (or filament beam) traveling in an undulator with a pure sinusoidal magnetic field in one direction will produce a complicated wavefront with geometry that varies as a function of the photon frequency (see, e.g., Ref.~\cite{elleaume}). At the resonance energy the angular emission in the far field can be approximated by a Gaussian function of width \cite{elleaume}
+A single electron (or filament beam) traveling in an undulator with a pure sinusoidal magnetic field in one direction will produce a complicated wavefront with geometry that varies as a function of the photon frequency (see, e.g., \citep{elleaume}). At the resonance energy the angular emission in the far field can be approximated by a Gaussian function of width \citep{elleaume}
 \begin{equation}
 \label{eq:undulatorDivergence}
     \sigma'_u \approx\sqrt{\frac{\lambda}{2 L}},
@@ -296,7 +297,7 @@ For practical purposes, the Gaussian source approximation can be used for optica
 \subsection{``Undulator Gaussian Shell-model 1D" widget}
 \label{sec:undulatorGSM}
 
-The real emission of the undulator is is very different than a Gaussian. However, the (inadequate) use of a Gaussian approximation for the undulator radiation is often found in literature, e.g.  \cite{coisson1997}.
+The real emission of the undulator is is very different than a Gaussian. However, the (inadequate) use of a Gaussian approximation for the undulator radiation is often found in literature, e.g.  \citep{coisson1997}.
 We have developed the ``Undulator Gaussian Shell-model 1D" widget
 aiming to compare the CMD of the undulator emission discussed before with the approximation given by GSM.
 % However, there are several possible ways to match the undulator parameters to the GSM parameters $\sigma_I$ and $\sigma_\mu$. We explain here the methodology used in WOFRY. 
@@ -556,12 +557,12 @@ When the beams are propagated at a distance \SI{30}{meter} downstream from the s
 % -----------------------------------------------------------------
 \subsection{Other systems calculated with WOFRY}
 
-WOFRY has played a crucial role in numerous studies, also contributing to the enhancement and optimization of the code and algorithms. Examples include analyzing the efficacy of adaptive X-ray optics in correcting mirror deformations induced by heat load \cite{SanchezdelRio2020}, studying modifications in beam focus due to cropping partially coherent X-ray beams \cite{SanchezdelRio2022EPL}, and assessing beam quality after reflection by a toroidal mirror in a 4th generation storage-ring beamline \cite{ReyesHerrera2023}.
+WOFRY has played a crucial role in numerous studies, also contributing to the enhancement and optimization of the code and algorithms. Examples include analyzing the efficacy of adaptive X-ray optics in correcting mirror deformations induced by heat load \citep{SanchezdelRio2020}, studying modifications in beam focus due to cropping partially coherent X-ray beams \citep{SanchezdelRio2022EPL}, and assessing beam quality after reflection by a toroidal mirror in a 4th generation storage-ring beamline \citep{ReyesHerrera2023}.
 
 % -----------------------------------------------------------------
 \section{Summary and conclusions}
 \label{sec:summary}
-In this paper we describe the models implemented in WOFRY (Wave Optics FRamework in pYthon), a wave optics toolbox. It implements a useful model for computing the coherence parameters of synchrotron beamlines, like cross-spectral density and coherent fraction. The software is included in the OASYS\cite{OASYS} suite. We have illustrated the applicability of WOFRY with some examples, from simple diffraction limited waves, to computing the coherent fraction using ``coherent slits". Moreover WOFRY also implements the undulator radiation approximated by the Gaussian Shell-model. In section~\ref{ec:CMDvsGSM} we compare this method with the more exact undulator radiation by numeric coherent mode decomposition. It is shown that, although GSM may reproduce reasonably well the beam characteristics at the source position, but after propagation the differences become important. This 
+In this paper we describe the models implemented in WOFRY (Wave Optics FRamework in pYthon), a wave optics toolbox. It implements a useful model for computing the coherence parameters of synchrotron beamlines, like cross-spectral density and coherent fraction. The software is included in the OASYS \citep{OASYS} suite. We have illustrated the applicability of WOFRY with some examples, from simple diffraction limited waves, to computing the coherent fraction using ``coherent slits". Moreover WOFRY also implements the undulator radiation approximated by the Gaussian Shell-model. In section~\ref{ec:CMDvsGSM} we compare this method with the more exact undulator radiation by numeric coherent mode decomposition. It is shown that, although GSM may reproduce reasonably well the beam characteristics at the source position, but after propagation the differences become important. This 
 
 
 
@@ -571,8 +572,8 @@ In this paper we describe the models implemented in WOFRY (Wave Optics FRamework
 
 
 
-% \bibliographystyle{agsm}
-\bibliographystyle{vancouver}
+\bibliographystyle{agsm}
+%\bibliographystyle{vancouver}
 
 \bibliography{iucr} % loads iucr.bib
 % \referencelist{iucr}
